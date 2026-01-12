@@ -1,16 +1,64 @@
-# React + Vite
+# ISS Tracker
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A real-time International Space Station tracker that displays the ISS position on an interactive 3D globe with live telemetry data.
 
-Currently, two official plugins are available:
+![ISS Tracker](https://img.shields.io/badge/React-19-blue) ![Vite](https://img.shields.io/badge/Vite-7-purple) ![Three.js](https://img.shields.io/badge/Three.js-3D-green)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
 
-## React Compiler
+- **Live ISS Tracking** - Real-time position updates every 2 seconds from the Where The ISS At API
+- **3D Globe Visualization** - Interactive Earth with realistic textures, atmospheric effects, and auto-rotation
+- **Custom ISS Model** - 3D representation of the ISS with solar panels and main module
+- **Location Detection** - Shows which country or ocean the ISS is currently near/over
+- **Telemetry HUD** - Displays latitude, longitude, altitude, velocity, visibility, and timestamp
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Tech Stack
 
-## Expanding the ESLint configuration
+- **React 19** - UI framework
+- **Vite 7** - Build tool and dev server
+- **Three.js** - 3D graphics library
+- **react-globe.gl** - Globe visualization component
+- **Tailwind CSS 4** - Styling
+- **Axios** - HTTP client for API requests
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Setup
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/Vic563/ISS-Tracker.git
+   cd ISS-Tracker
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Start the development server:
+   ```bash
+   npm run dev
+   ```
+
+4. Open http://localhost:5173 in your browser
+
+## Project Structure
+
+```
+src/
+├── App.jsx                 # Main application component
+├── components/
+│   ├── GlobeView.jsx       # 3D globe with ISS visualization
+│   └── StatsPanel.jsx      # Telemetry HUD display
+└── services/
+    ├── ISSService.js       # ISS position API integration
+    └── LocationService.js  # Reverse geocoding for location detection
+```
+
+## APIs Used
+
+- **[Where The ISS At](https://wheretheiss.at/)** - Real-time ISS position data
+- **[BigDataCloud](https://www.bigdatacloud.com/)** - Free reverse geocoding (no API key required)
+
+## License
+
+MIT
