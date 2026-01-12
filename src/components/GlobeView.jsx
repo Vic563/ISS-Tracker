@@ -1,6 +1,5 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 import Globe from 'react-globe.gl';
-import * as THREE from 'three';
 
 const GlobeView = ({ issData, onCountryHover }) => {
     const globeEl = useRef();
@@ -24,7 +23,7 @@ const GlobeView = ({ issData, onCountryHover }) => {
         }
     }, []);
 
-    const objectsData = issData ? [issData] : [];
+    const issMarkerData = issData ? [issData] : [];
 
     const handlePolygonHover = (polygon) => {
         setHoveredCountry(polygon);
@@ -33,8 +32,57 @@ const GlobeView = ({ issData, onCountryHover }) => {
         }
     };
 
+    // Create ISS HTML element marker
+    const createIssElement = useCallback(() => {
+        const el = document.createElement('div');
+        el.innerHTML = `
+            <div style="
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                cursor: pointer;
+                transform: translate(-50%, -50%);
+            ">
+                <div style="
+                    width: 50px;
+                    height: 50px;
+                    background: radial-gradient(circle, rgba(255,100,100,1) 0%, rgba(255,50,50,0.8) 40%, rgba(255,0,0,0) 70%);
+                    border-radius: 50%;
+                    animation: pulse 1.5s ease-in-out infinite;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                ">
+                    <div style="
+                        font-size: 24px;
+                        filter: drop-shadow(0 0 4px white);
+                    ">🛰️</div>
+                </div>
+                <div style="
+                    background: rgba(0,0,0,0.8);
+                    color: cyan;
+                    padding: 4px 8px;
+                    border-radius: 4px;
+                    font-size: 11px;
+                    font-family: monospace;
+                    font-weight: bold;
+                    margin-top: 4px;
+                    white-space: nowrap;
+                    border: 1px solid rgba(0,255,255,0.5);
+                ">ISS</div>
+            </div>
+        `;
+        return el;
+    }, []);
+
     return (
         <>
+            <style>{`
+                @keyframes pulse {
+                    0%, 100% { transform: scale(1); opacity: 1; }
+                    50% { transform: scale(1.3); opacity: 0.7; }
+                }
+            `}</style>
             <Globe
                 ref={globeEl}
                 globeImageUrl="//unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
@@ -57,62 +105,12 @@ const GlobeView = ({ issData, onCountryHover }) => {
                 onPolygonHover={handlePolygonHover}
                 polygonLabel={(d) => `<div style="background: rgba(0,0,0,0.8); padding: 8px 12px; border-radius: 4px; color: white; font-family: monospace;">${d.properties.ADMIN}</div>`}
 
-                // ISS marker
-                objectsData={objectsData}
-                objectLat="lat"
-                objectLng="lng"
-                objectAltitude={(d) => (d.alt || 420) / 6371}
-                objectThreeObject={() => {
-                    // Create a group to hold the ISS parts
-                    const group = new THREE.Group();
-
-                    // Main Module (Cylinder)
-                    const bodyGeo = new THREE.CylinderGeometry(0.3, 0.3, 2.5, 16);
-                    const bodyMat = new THREE.MeshLambertMaterial({ color: 0xeeeeee, emissive: 0x333333 });
-                    const body = new THREE.Mesh(bodyGeo, bodyMat);
-                    body.rotation.z = Math.PI / 2;
-                    group.add(body);
-
-                    // Solar Panels (Box) - made more prominent
-                    const panelGeo = new THREE.BoxGeometry(1, 0.05, 5);
-                    const panelMat = new THREE.MeshLambertMaterial({
-                        color: 0x4488ff,
-                        emissive: 0x224488,
-                        emissiveIntensity: 0.5
-                    });
-
-                    const leftPanel = new THREE.Mesh(panelGeo, panelMat);
-                    leftPanel.position.set(0, 0, 0);
-                    group.add(leftPanel);
-
-                    // Cross bar structure
-                    const crossBarGeo = new THREE.CylinderGeometry(0.08, 0.08, 5, 8);
-                    const crossBar = new THREE.Mesh(crossBarGeo, bodyMat);
-                    crossBar.rotation.x = Math.PI / 2;
-                    group.add(crossBar);
-
-                    // Add a glowing sphere marker for better visibility
-                    const markerGeo = new THREE.SphereGeometry(0.8, 16, 16);
-                    const markerMat = new THREE.MeshBasicMaterial({
-                        color: 0xff3333,
-                        transparent: true,
-                        opacity: 0.6
-                    });
-                    const marker = new THREE.Mesh(markerGeo, markerMat);
-                    marker.position.set(0, 1.5, 0);
-                    group.add(marker);
-
-                    // Scale up significantly for visibility on the globe
-                    group.scale.set(0.15, 0.15, 0.15);
-
-                    return group;
-                }}
-                objectLabel={() => `
-                    <div style="background: rgba(0,0,0,0.9); padding: 10px 14px; border-radius: 6px; color: white; font-family: monospace; border: 1px solid cyan;">
-                        <div style="color: cyan; font-weight: bold;">ISS</div>
-                        <div style="font-size: 11px; color: #aaa;">International Space Station</div>
-                    </div>
-                `}
+                // ISS HTML marker
+                htmlElementsData={issMarkerData}
+                htmlLat={(d) => d.lat}
+                htmlLng={(d) => d.lng}
+                htmlAltitude={(d) => (d.alt || 420) / 6371 / 2}
+                htmlElement={createIssElement}
             />
 
             {/* Hovered country display */}
