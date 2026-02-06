@@ -15,7 +15,7 @@ interface UseISSPositionReturn extends ISSPosition {
 }
 
 const API_URL = 'https://api.wheretheiss.at/v1/satellites/25544'
-const POLL_INTERVAL = 5000
+const POLL_INTERVAL = 3000
 
 export function useISSPosition(): UseISSPositionReturn {
   const [position, setPosition] = useState<ISSPosition>({
